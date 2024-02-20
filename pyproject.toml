@@ -1,0 +1,22 @@
+[project]
+name = "face_search"
+version = "0.1.0"
+description = "Default template for PDM package"
+authors = [
+    {name = "Abdelrhman Nile", email = "abdelrhmannile@gmail.com"},
+]
+dependencies = [
+    "tensorflow>=2.15.0",
+    "deepface>=0.0.84",
+    "mtcnn>=0.1.1",
+    "scikit-learn>=1.4.1.post1",
+    "faiss-cpu==1.7.4",
+    "streamlit>=1.31.1",
+]
+requires-python = "==3.11.*"
+readme = "README.md"
+license = {text = "MIT"}
+
+
+[tool.pdm]
+distribution = false
