@@ -6,7 +6,7 @@ Quickly search for faces in a directory of images. <br />
   1. MTCNN for face detection,
  2. FaceNet for face embeddings,
  3. DBscan for organizing the faces into clusters,
- 4. fiass for searching the clusters for a specific face.
+ 4. faiss for searching the clusters for a specific face.
 
 ## Installation
 to reproduce the development environment, use PDM
