@@ -23,3 +23,4 @@ pdm install
 ```bash
 pdm run streamlit run src/face_search/app.py
 ```
+ِi povided 2 examples to test on `q_1.jpg` and `q_2.jpg` in the `src/face_search` directory.
