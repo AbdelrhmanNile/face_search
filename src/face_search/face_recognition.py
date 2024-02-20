@@ -11,7 +11,13 @@ import faiss
 
 
 class FaceRecognitionClient:
-    def __init__(self, vector_db_path=None):
+    def __init__(
+        self,
+        vector_db_path=None,
+        images_dir=None,
+        clusters_dir=None,
+        is_clustered=False,
+    ):
         # load face detection model
         self.detector = mtcnn.MTCNN()
 
@@ -22,11 +28,10 @@ class FaceRecognitionClient:
         # l2 normalizer for face embeddings
         self.l2_normalizer = Normalizer("l2")
 
-        # load index
-        if vector_db_path is not None:
+        if is_clustered:
             self.index = faiss.read_index(vector_db_path)
         else:
-            self.index = None
+            self.cluster_faces(images_dir, clusters_dir)
 
     def crop_face(self, img, x1, y1, x2, y2):
         return img[y1:y2, x1:x2]
@@ -123,6 +128,8 @@ class FaceRecognitionClient:
         embeddings = []
         cluster_ids = os.listdir(clustered_db_path)
         for cluster_id in cluster_ids:
+            if cluster_id == "index.faiss":
+                continue
             cluster_dir = os.path.join(clustered_db_path, cluster_id)
             images = os.listdir(cluster_dir)
             image = images[0]

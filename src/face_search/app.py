@@ -9,7 +9,12 @@ images_dir = "./src/face_search/faces"
 output_dir = "./src/face_search/faces_clustered"
 vector_db_path = "./src/face_search/faces_clustered/index.faiss"
 
-fr = FaceRecognitionClient(vector_db_path)
+fr = FaceRecognitionClient(
+    vector_db_path=vector_db_path,
+    images_dir=images_dir,
+    clusters_dir=output_dir,
+    is_clustered=True,  # set to false if you want to re cluster the images
+)
 
 
 def main():
