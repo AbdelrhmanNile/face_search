@@ -144,8 +144,8 @@ class FaceRecognitionClient:
         # convert to numpy array
         embeddings = np.concatenate(embeddings, axis=0)
 
-        # build index
-        index = faiss.IndexFlatIP(embeddings.shape[1])
+        # build index, use euclidean distance
+        index = faiss.IndexFlatL2(embeddings.shape[1])
         index.add(embeddings)
 
         # save index
