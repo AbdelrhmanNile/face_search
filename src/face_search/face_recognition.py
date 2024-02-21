@@ -31,6 +31,9 @@ class FaceRecognitionClient:
         if is_clustered:
             self.index = faiss.read_index(vector_db_path)
         else:
+            # remove existing clusters
+            if os.path.exists(clusters_dir):
+                shutil.rmtree(clusters_dir)
             self.cluster_faces(images_dir, clusters_dir)
 
     def crop_face(self, img, x1, y1, x2, y2):
@@ -127,10 +130,12 @@ class FaceRecognitionClient:
         # from each cluster, get 1 embedding
         embeddings = []
         cluster_ids = os.listdir(clustered_db_path)
+        cluster_ids = [
+            int(cluster_id) for cluster_id in cluster_ids if cluster_id != "index.faiss"
+        ]
+        cluster_ids.sort()
         for cluster_id in cluster_ids:
-            if cluster_id == "index.faiss":
-                continue
-            cluster_dir = os.path.join(clustered_db_path, cluster_id)
+            cluster_dir = os.path.join(clustered_db_path, str(cluster_id))
             images = os.listdir(cluster_dir)
             image = images[0]
             embedding = self.get_face_embeddings(os.path.join(cluster_dir, image))

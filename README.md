@@ -24,3 +24,13 @@ pdm install
 pdm run streamlit run src/face_search/app.py
 ```
 ِi provided 2 examples to test on `q_1.jpg` and `q_2.jpg` in the `src/face_search` directory.
+
+### Using web cam
+
+to test it with webcam and your own pictures, do the following:
+1. place your pictures in the `src/face_search/faces` directory, minimum 2 pictures.
+2. run the web cam version of the app by running
+```bash
+pdm run streamlit run src/face_search/app_webcam.py
+```
+**Note:** the webcam version will be SLOWER, streamlit issue.
