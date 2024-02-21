@@ -25,6 +25,10 @@ pdm run streamlit run src/face_search/app.py
 ```
 ِi provided 2 examples to test on `q_1.jpg` and `q_2.jpg` in the `src/face_search` directory.
 
+
+https://github.com/AbdelrhmanNile/face_search/assets/90456995/c227446e-1d94-4eb9-8b8e-5af56589b409
+
+
 ### Using web cam
 
 to test it with webcam and your own pictures, do the following:
