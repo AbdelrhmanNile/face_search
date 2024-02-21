@@ -1,28 +1,35 @@
-# webcam version of the app
-import cv2
-import numpy as np
 import streamlit as st
-from PIL import Image
-from face_recognition import FaceRecognitionClient
-import os
+import numpy as np
 import PIL
+import os
+from sklearn.preprocessing import Normalizer
 
+from modules.detection import MTCNNDetectionStrategy
+from modules.representation import FaceNetEmbeddingStrategy
+from modules.clustering import DBSCANClusteringStrategy
 
-images_dir = "./src/face_search/faces"
-output_dir = "./src/face_search/faces_clustered"
-vector_db_path = "./src/face_search/faces_clustered/index.faiss"
+from modules.recognition import FaceRecognitionClient
 
-fr = FaceRecognitionClient(
-    vector_db_path=vector_db_path,
-    images_dir=images_dir,
-    clusters_dir=output_dir,
+IMAGES_DIR = "./src/face_search/faces"
+OUTPUT_DIR = "./src/face_search/faces_clustered"
+VECTOR_DB_PATH = "./src/face_search/faces_clustered/index.faiss"
+FACENET_WEIGHTS = "./src/face_search/weights/facenet_keras_weights.h5"
+
+client = FaceRecognitionClient(
+    detection_strategy=MTCNNDetectionStrategy(),
+    embedding_strategy=FaceNetEmbeddingStrategy(weights_path=FACENET_WEIGHTS),
+    clustering_strategy=DBSCANClusteringStrategy(
+        eps=0.5, min_samples=2, metric="cosine"
+    ),
+    l2_normalizer=Normalizer("l2"),
+    images_dir=IMAGES_DIR,
+    clusters_dir=OUTPUT_DIR,
+    vector_db_path=VECTOR_DB_PATH,
     is_clustered=False,
     # please note that it will be slow if you set is_clustered to false
     # streamlit for some reason re runs the whole script several time and with is_clustered set to false
     # clustring will be done several times.
 )
-
-print("Face Recognition Client initialized")
 
 
 def main():
@@ -43,12 +50,13 @@ def main():
         img = np.array(img)
 
         if st.button("Search"):
-            result = fr.search(img, top_k=1)
-            cluster_path = os.path.join(output_dir, str(result))
+            result = client.search(img, top_k=1)
+            cluster_path = os.path.join(OUTPUT_DIR, str(result))
             st.write("Retrieved faces:")
             for image in os.listdir(cluster_path):
                 img_path = os.path.join(cluster_path, image)
                 st.image(img_path, use_column_width=True)
 
 
-main()
+if __name__ == "__main__":
+    main()

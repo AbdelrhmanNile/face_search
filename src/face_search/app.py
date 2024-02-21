@@ -1,19 +1,31 @@
-from face_recognition import FaceRecognitionClient
 import streamlit as st
-import os
-import PIL
 import numpy as np
+import PIL
+import os
+from sklearn.preprocessing import Normalizer
 
+from modules.detection import MTCNNDetectionStrategy
+from modules.representation import FaceNetEmbeddingStrategy
+from modules.clustering import DBSCANClusteringStrategy
 
-images_dir = "./src/face_search/faces"
-output_dir = "./src/face_search/faces_clustered"
-vector_db_path = "./src/face_search/faces_clustered/index.faiss"
+from modules.recognition import FaceRecognitionClient
 
-fr = FaceRecognitionClient(
-    vector_db_path=vector_db_path,
-    images_dir=images_dir,
-    clusters_dir=output_dir,
-    is_clustered=True,  # set to false if you want to re cluster the images
+IMAGES_DIR = "./src/face_search/faces"
+OUTPUT_DIR = "./src/face_search/faces_clustered"
+VECTOR_DB_PATH = "./src/face_search/faces_clustered/index.faiss"
+FACENET_WEIGHTS = "./src/face_search/weights/facenet_keras_weights.h5"
+
+client = FaceRecognitionClient(
+    detection_strategy=MTCNNDetectionStrategy(),
+    embedding_strategy=FaceNetEmbeddingStrategy(weights_path=FACENET_WEIGHTS),
+    clustering_strategy=DBSCANClusteringStrategy(
+        eps=0.5, min_samples=2, metric="cosine"
+    ),
+    l2_normalizer=Normalizer("l2"),
+    images_dir=IMAGES_DIR,
+    clusters_dir=OUTPUT_DIR,
+    vector_db_path=VECTOR_DB_PATH,
+    is_clustered=True,  # set to False if you want to re-cluster the images
     # please note that it will be slow if you set is_clustered to false
     # streamlit for some reason re runs the whole script several time and with is_clustered set to false
     # clustring will be done several times.
@@ -37,11 +49,10 @@ def main():
         img = np.array(img)
 
         if st.button("Search"):
-            result = fr.search(img, top_k=1)
-            cluster_path = os.path.join(output_dir, str(result))
-            print(cluster_path)
-            print("#############")
-            st.write("Retrieved faces:")
+            result = client.search(img, top_k=1)
+            cluster_path = os.path.join(OUTPUT_DIR, str(result))
+
+            st.write("Retrieved images:")
             for image in os.listdir(cluster_path):
                 img_path = os.path.join(cluster_path, image)
                 st.image(img_path, use_column_width=True)
